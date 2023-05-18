@@ -11,3 +11,6 @@ On your client machine where you deploy the headnode of the cluster install Terr
 
 Step 2. Install the Crusoe Cloud CLI
 Install the Crusoe Cloud ClI following [these instructions](https://docs.crusoecloud.com/quickstart/install-the-cli/index.html), setup the authentication layer by creating ssh keys and API tokens.
+
+Step 3. Clone repo and create a `variables.tf` File
+
