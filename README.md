@@ -13,4 +13,22 @@ Step 2. Install the Crusoe Cloud CLI
 Install the Crusoe Cloud ClI following [these instructions](https://docs.crusoecloud.com/quickstart/install-the-cli/index.html), setup the authentication layer by creating ssh keys and API tokens.
 
 Step 3. Clone repo and create a `variables.tf` File
+```
+git clone https://github.com/crusoecloud/crusoe-hpc-slurm.git
+cd crusoe-hpc-slurm
+```
+Your `variables.tf` contains the following:
+```
+variable "access_key" {
+   description = "Crusoe API Access Key"
+   type        = string
+   default     = "<ACCESS_KEY>"
+ }
+variable "secret_key" {
+   description = "Crusoe API Secret Key"
+   type        = string
+   default     = "<SECRET_KEY>"
+ }
+```
+Step 4. 
 
