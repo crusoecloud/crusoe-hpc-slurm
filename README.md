@@ -5,6 +5,15 @@ This is a reference design implementation of [SLURM](https://slurm.schedmd.com/o
 ## Known Issues
 1. Currently we only have GPU-enabled instances, the headnode of the cluster is based on a single GPU to lower costs. This will be replaced with CPU-based instances once available
 
+## Description of the Architecture
+The terraform script will simply provision a headnode, the `headnode-bootstrap.sh`script will perform the following:
+1. Will scan for number of ephemeral drives and mount it as RAID0 for number of drives > 1 at mount point `/raid0` for instances with a single nvme local epehmeral drive it will be mounted as `/nvme` and the `scratch` directory will inside that path
+2. A NFS server is also setup at `/nfs/slurm` which provides the SLURM binaries, libraries and helper code to the ephemeral compute nodes
+3. Download and install SLURM source tree. The SLURM version is controlled by the bootstrap script to ensure its supported on Crusoe. Changing the version in the repo is NOT supported, unless is validated by Crusoe.
+
+TODO:
+Will host the headnode as a frontend for a Grafana interface and have telemetry from the compute nodes push to a time series on the headnode.
+
 ## Deployment
 Step 1. Install Terraform
 On your client machine where you deploy the headnode of the cluster install Terraform following the instructions [here](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli).
