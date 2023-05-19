@@ -8,7 +8,7 @@ export SLURM_HEADNODE_IP=$(jq ".network_interfaces[0].ips[0].private_ipv4.addres
 export SLURM_HEADNODE_NAME=$(jq ".name" /root/metadata.json | tr -d '"')
 export SLURM_POWER_LOG=/var/log/power_save.log
 export PATH=$PATH:/usr/bin:/usr/local/bin:/nfs/slurm/bin
-. /nfs/crusoe-cli.sh
+. $CRUSOE_HOME/crusoe-cli.sh
 ##############################################
 # DONOT EDIT BELOW THIS LINE
 ##############################################

@@ -8,7 +8,7 @@ export CRUSOE_HOME=/nfs/crusoecloud
 export SLURM_CONF=/nfs/slurm/etc/slurm.conf
 export SLURM_POWER_LOG=/var/log/power_save.log
 export PATH=$PATH:/usr/bin:/usr/local/bin:/nfs/slurm/bin
-. /nfs/crusoe-cli.sh
+. $CRUSOE_HOME/crusoe-cli.sh
 
 function crusoe_stop()
 {
