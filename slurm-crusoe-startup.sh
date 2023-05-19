@@ -3,6 +3,7 @@
 # DESCRIPTION: SLURM STARTUP
 # Script/Code is provided, as is, and with no warranty
 export SLURM_HOME=/nfs/slurm
+export CRUSOE_HOME=/nfs/crusoecloud
 export SLURM_HEADNODE_IP=$(jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"')
 export SLURM_HEADNODE_NAME=$(jq ".name" /root/metadata.json | tr -d '"')
 export SLURM_POWER_LOG=/var/log/power_save.log
@@ -20,6 +21,7 @@ function crusoe_startup()
 # compute node can resolve headnode
 # adding packages
 export SLURM_HOME=/nfs/slurm
+export CRUSOE_HOME=/nfs/crusoecloud
 export DEBIAN_FRONTEND=noninteractive
 echo "deb [trusted=yes] https://apt.fury.io/crusoe/ * *" > /etc/apt/sources.list.d/fury.list
 
@@ -47,9 +49,9 @@ else
 fi
 
 # setting hostname
-cp /nfs/crusoecloud/crusoe-cli.sh /etc/profile.d/crusoe-cli.sh
+cp \$CRUSOE_HOME/crusoe-cli.sh /etc/profile.d/crusoe-cli.sh
 . /etc/profile.d/crusoe-cli.sh
-/nfs/crusoecloud/crusoe compute vms get $1 -f json >> /root/metadata.json
+\$CRUSOE_HOME/crusoe compute vms get $1 -f json >> /root/metadata.json
 local_ip=\$(jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"')
 host=\$(jq ".name" /root/metadata.json | tr -d '"')
 /usr/bin/hostname $1
@@ -96,7 +98,7 @@ echo "required /usr/lib/x86_64-linux-gnu/slurm/spank_pyxis.so runtime_path=/scra
 systemctl enable --now slurmd.service
 END
 
-    /nfs/crusoe compute vms create --name $1 --type a100-80gb.1x \
+    $CRUSOE_HOME/crusoe compute vms create --name $1 --type a100-80gb.1x \
         --startup-script $TMPFILE --keyfile $CRUSOE_SSH_PUBLIC_KEY_FILE >> $SLURM_POWER_LOG 2>&1
     rm -rf $TMPFILE
 }
@@ -110,7 +112,7 @@ for host in $hosts; do
 done
 wait
 for host in $hosts; do
-   compute_private_ip=$(/nfs/crusoe compute vms get $host -f json | jq ".network_interfaces[0].ips[0].private_ipv4.address" | tr -d '"')
+   compute_private_ip=$($CRUSOE_HOME/crusoe compute vms get $host -f json | jq ".network_interfaces[0].ips[0].private_ipv4.address" | tr -d '"')
    echo "$compute_private_ip    $host" | tee -a /etc/hosts
    $SLURM_ROOT/bin/scontrol update nodename=$host nodeaddr=$compute_private_ip nodehostname=$host
 done
