@@ -38,4 +38,9 @@ locals {
   headnode_instance_type="a100-80gb.1x"
 }
 ``` 
-
+Step 5. Execute the terraform script
+```
+terraform init
+terraform plan
+terraform apply
+```
