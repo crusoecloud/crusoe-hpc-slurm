@@ -30,5 +30,12 @@ variable "secret_key" {
    default     = "<SECRET_KEY>"
  }
 ```
-Step 4. In the `main.tf` file 
+Step 4. In the `main.tf` file replace the local values with provide a path for the private ssh key and the string of the public key. And choose an instance type for the headnode
+```
+locals {
+  my_ssh_privkey_path="/Users/amrragab/.ssh/id_ed25519"
+  my_ssh_pubkey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIdc3Aaj8RP7ru1oSxUuehTRkpYfvxTxpvyJEZqlqyze amrragab@MBP-Amr-Ragab.local"
+  headnode_instance_type="a100-80gb.1x"
+}
+``` 
 

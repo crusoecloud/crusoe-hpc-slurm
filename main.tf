@@ -9,6 +9,7 @@ terraform {
 locals {
   my_ssh_privkey_path="/Users/amrragab/.ssh/id_ed25519"
   my_ssh_pubkey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIdc3Aaj8RP7ru1oSxUuehTRkpYfvxTxpvyJEZqlqyze amrragab@MBP-Amr-Ragab.local"
+  headnode_instance_type="a100-80gb.1x"
 }
 
 provider "crusoe" {
@@ -20,18 +21,18 @@ provider "crusoe" {
 resource "crusoe_compute_instance" "headnode_vm" {
     count = 1
     name = "crusoe-headnode-${count.index}"
-    type = "a100-80gb.1x"
-    ssh_key = local.my_ssh_key
+    type = local.headnode_instance_type
+    ssh_key = local.my_ssh_pubkey
     startup_script = file("headnode-bootstrap.sh")
 
     provisioner "file" {
-      content      = local.my_ssh_key
+      content      = local.my_ssh_pubkey
       destination = "/root/provision.key"
       connection {
         type = "ssh"
         user = "root"
         host = "${self.network_interfaces[0].public_ipv4.address}"
-        private_key = file("/Users/amrragab/.ssh/id_ed25519")
+        private_key = file("${local.my_ssh_privkey_path}")
       }
     }
     provisioner "remote-exec" {
@@ -45,10 +46,9 @@ resource "crusoe_compute_instance" "headnode_vm" {
         type = "ssh"
         user = "root"
         host = "${self.network_interfaces[0].public_ipv4.address}"
-        private_key = file("/Users/amrragab/.ssh/id_ed25519")
+        private_key = file("${local.my_ssh_privkey_path}")
       }
     }
-
     provisioner "local-exec" {
       command = "~/go/bin/crusoe compute vms get ${self.name} -f json >> /tmp/metadata.${self.name}.json"
     }
@@ -59,10 +59,9 @@ resource "crusoe_compute_instance" "headnode_vm" {
         type = "ssh"
         user = "root"
         host = "${self.network_interfaces[0].public_ipv4.address}"
-        private_key = file("/Users/amrragab/.ssh/id_ed25519")
+        private_key = file("${local.my_ssh_privkey_path}")
       }
     }
-
     provisioner "file" {
       source      = "~/go/bin/linux_amd64/crusoe"
       destination = "/root/crusoe"
@@ -70,10 +69,9 @@ resource "crusoe_compute_instance" "headnode_vm" {
         type = "ssh"
         user = "root"
         host = "${self.network_interfaces[0].public_ipv4.address}"
-        private_key = file("/Users/amrragab/.ssh/id_ed25519")
+        private_key = file("${local.my_ssh_privkey_path}")
       }
     }
-
     provisioner "file" {
       source      = "slurm-crusoe-startup.sh"
       destination = "/tmp/slurm-crusoe-startup.sh"
@@ -81,10 +79,9 @@ resource "crusoe_compute_instance" "headnode_vm" {
         type = "ssh"
         user = "root"
         host = "${self.network_interfaces[0].public_ipv4.address}"
-        private_key = file("/Users/amrragab/.ssh/id_ed25519")
+        private_key = file("${local.my_ssh_privkey_path}")
       }
     }
-
     provisioner "file" {
       source      = "slurm-crusoe-shutdown.sh"
       destination = "/tmp/slurm-crusoe-shutdown.sh"
@@ -92,10 +89,9 @@ resource "crusoe_compute_instance" "headnode_vm" {
         type = "ssh"
         user = "root"
         host = "${self.network_interfaces[0].public_ipv4.address}"
-        private_key = file("/Users/amrragab/.ssh/id_ed25519")
+        private_key = file("${local.my_ssh_privkey_path}")
       }
     }
-
     provisioner "file" {
       source      = "slurm.conf"
       destination = "/tmp/slurm.conf"
@@ -103,7 +99,7 @@ resource "crusoe_compute_instance" "headnode_vm" {
         type = "ssh"
         user = "root"
         host = "${self.network_interfaces[0].public_ipv4.address}"
-        private_key = file("/Users/amrragab/.ssh/id_ed25519")
+        private_key = file("${local.my_ssh_privkey_path}")
       }
     }
     provisioner "file" {
@@ -113,10 +109,9 @@ resource "crusoe_compute_instance" "headnode_vm" {
         type = "ssh"
         user = "root"
         host = "${self.network_interfaces[0].public_ipv4.address}"
-        private_key = file("/Users/amrragab/.ssh/id_ed25519")
+        private_key = file("${local.my_ssh_privkey_path}")
       }
     }
-
     provisioner "local-exec" {
         command = "rm -rf /tmp/metadata.${self.name}.json"
     }
