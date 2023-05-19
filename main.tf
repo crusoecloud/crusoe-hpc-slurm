@@ -7,7 +7,8 @@ terraform {
 }
 
 locals {
-  my_ssh_key="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIdc3Aaj8RP7ru1oSxUuehTRkpYfvxTxpvyJEZqlqyze amrragab@MBP-Amr-Ragab.local"
+  my_ssh_privkey_path="/Users/amrragab/.ssh/id_ed25519"
+  my_ssh_pubkey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIdc3Aaj8RP7ru1oSxUuehTRkpYfvxTxpvyJEZqlqyze amrragab@MBP-Amr-Ragab.local"
 }
 
 provider "crusoe" {
@@ -18,7 +19,7 @@ provider "crusoe" {
 
 resource "crusoe_compute_instance" "headnode_vm" {
     count = 1
-    name = "aragab-headnode-${count.index}"
+    name = "crusoe-headnode-${count.index}"
     type = "a100-80gb.1x"
     ssh_key = local.my_ssh_key
     startup_script = file("headnode-bootstrap.sh")
