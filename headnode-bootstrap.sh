@@ -133,11 +133,14 @@ sed -i "s|@HEADNODE_IP@|$local_ip|g" /etc/telegraf/telegraf.conf
 cp /etc/telegraf/telegraf.conf /nfs/monitoring/telegraf.conf
 
 mv /tmp/prometheus.yml /etc/prometheus/prometheus.yml
-sed -i "s|@HEADNODE_IP@|$local_ip|g" /etc/prometheus/prometheus.yml
+sed -i "s|@HEADNODE@|$host|g" /etc/prometheus/prometheus.yml
 
 #Start services
-sudo systemctl enable --now prometheus
 sudo systemctl enable --now telegraf
+sudo systemctl enable --now prometheus
 sudo systemctl enable --now grafana-server
+
+curl --insecure 'http://admin:admin@127.0.0.1:3000/api/datasources' -X POST -H 'Content-Type: application/json;charset=UTF-8' --data-binary '{"name":"telegraf","type":"prometheus","url":"http://localhost:9090", "access":"proxy", "basicAuth":false}'
+
 sudo systemctl enable --now slurmctld
 sudo systemctl enable --now slurmd
