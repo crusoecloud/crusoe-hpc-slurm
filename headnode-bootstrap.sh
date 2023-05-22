@@ -66,10 +66,12 @@ echo 'PATH=$SLURM_HOME/bin:$PATH' | sudo tee -a /etc/profile.d/slurm.sh
 mkdir -p /var/spool/slurm
 mkdir -p $SLURM_HOME/etc/slurm.conf.d
 
+# Configure SLURM nodes
 echo "NodeName=@RANGE@ CPUs=8 State=Cloud" | sudo tee $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
 sed -i "s|@RANGE@|$host|g" $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
 echo "NodeName=aragab-compute-[0-20] CPUs=8 State=Cloud" | sudo tee -a $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
 
+# Put Startup/Shutdown scripts in place
 mv /tmp/slurm-crusoe-shutdown.sh $SLURM_HOME/bin && chmod +x $SLURM_HOME/bin/slurm-crusoe-shutdown.sh
 mv /tmp/slurm-crusoe-startup.sh $SLURM_HOME/bin && chmod +x $SLURM_HOME/bin/slurm-crusoe-startup.sh
 touch $SLURM_HOME/etc/gres.conf
@@ -81,11 +83,13 @@ cp /etc/profile.d/crusoe-cli.sh /nfs/crusoecloud
 DEBIAN_FRONTEND=noninteractive apt install -y jq squashfs-tools parallel fuse-overlayfs libnvidia-container-tools pigz \
                                               squashfuse devscripts debhelper zstd libslurm-dev
 
+# Install Enroot
 arch=$(dpkg --print-architecture)
 wget -O /tmp/enroot.deb "https://github.com/NVIDIA/enroot/releases/download/v3.4.1/enroot_3.4.1-1_${arch}.deb"
 wget -O /tmp/enroot_caps.deb "https://github.com/NVIDIA/enroot/releases/download/v3.4.1/enroot+caps_3.4.1-1_${arch}.deb"
 sudo apt install -y /tmp/enroot*.deb
 
+# Symlink Scratch to local ephemeral drive(s)
 if [ -d "/nvme" ]; then
    mkdir /nvme/scratch
    chmod -R 777 /nvme/scratch
@@ -98,16 +102,42 @@ else
    mkdir /scratch
 fi
 
+# Install NVIDIA Pyxis
 git clone https://github.com/NVIDIA/pyxis.git /tmp/pyxis
 cd /tmp/pyxis
 CFLAGS="-I /nfs/slurm/include" make orig
 CFLAGS="-I /nfs/slurm/include" make deb
 dpkg -i ../nvslurm-plugin-pyxis_*_amd64.deb
 
+# Configure Enroot/Pyxis
 mkdir -p /nfs/slurm/etc/plugstack.conf.d
 echo -e 'include /nfs/slurm/etc/plugstack.conf.d/*' | sudo tee /nfs/slurm/etc/plugstack.conf
 ln -s -f /usr/share/pyxis/pyxis.conf /nfs/slurm/etc/plugstack.conf.d/pyxis.conf
 mv /tmp/enroot.conf /etc/enroot/enroot.conf
 cp /etc/enroot/enroot.conf /nfs/enroot.conf
+
+# Configure monitoring
+mkdir -p /nfs/monitoring
+
+
+wget -q -O /usr/share/keyrings/grafana.key https://apt.grafana.com/gpg.key
+echo "deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+wget -q https://repos.influxdata.com/influxdata-archive_compat.key
+echo '393e8779c89ac8d958f81f942f9ad7fb82a25e133faddaf92e15b16e6ac9ce4c influxdata-archive_compat.key' | sha256sum -c && cat influxdata-archive_compat.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg > /dev/null
+echo 'deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https://repos.influxdata.com/debian stable main' | sudo tee /etc/apt/sources.list.d/influxdata.list
+
+apt update && apt install -y telegraf prometheus grafana
+
+mv /tmp/telegraf.conf /etc/telegraf/telegraf.conf
+sed -i "s|@HEADNODE_IP@|$local_ip|g" /etc/telegraf/telegraf.conf
+cp /etc/telegraf/telegraf.conf /nfs/monitoring/telegraf.conf
+
+mv /tmp/prometheus.yml /etc/prometheus/prometheus.yml
+sed -i "s|@HEADNODE_IP@|$local_ip|g" /etc/prometheus/prometheus.yml
+
+#Start services
+sudo systemctl enable --now prometheus
+sudo systemctl enable --now telegraf
+sudo systemctl enable --now grafana-server
 sudo systemctl enable --now slurmctld
 sudo systemctl enable --now slurmd

@@ -9,7 +9,7 @@ terraform {
 locals {
   my_ssh_privkey_path="/Users/amrragab/.ssh/id_ed25519"
   my_ssh_pubkey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIdc3Aaj8RP7ru1oSxUuehTRkpYfvxTxpvyJEZqlqyze amrragab@MBP-Amr-Ragab.local"
-  headnode_instance_type="a100-80gb.1x"
+  headnode_instance_type="a40.1x"
 }
 
 provider "crusoe" {
@@ -103,8 +103,28 @@ resource "crusoe_compute_instance" "headnode_vm" {
       }
     }
     provisioner "file" {
-      source      = "enroot.conf"
+      source      = "enroot/enroot.conf"
       destination = "/tmp/enroot.conf"
+      connection {
+        type = "ssh"
+        user = "root"
+        host = "${self.network_interfaces[0].public_ipv4.address}"
+        private_key = file("${local.my_ssh_privkey_path}")
+      }
+    }
+    provisioner "file" {
+      source      = "monitoring/telegraf.conf"
+      destination = "/tmp/telegraf.conf"
+      connection {
+        type = "ssh"
+        user = "root"
+        host = "${self.network_interfaces[0].public_ipv4.address}"
+        private_key = file("${local.my_ssh_privkey_path}")
+      }
+    }
+    provisioner "file" {
+      source      = "monitoring/prometheus.yml"
+      destination = "/tmp/prometheus.yml"
       connection {
         type = "ssh"
         user = "root"
