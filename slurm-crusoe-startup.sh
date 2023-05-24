@@ -27,6 +27,7 @@ echo "deb [trusted=yes] https://apt.fury.io/crusoe/ * *" > /etc/apt/sources.list
 
 adduser --disabled-password --shell /bin/bash --gecos "ubuntu" ubuntu
 echo 'ubuntu  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
+usermod -aG docker ubuntu
 
 apt update && apt upgrade -y
 apt install -y jq preload nvme-cli mdadm nfs-common nfs-kernel-server munge libmunge-dev crusoe ntp

@@ -25,6 +25,7 @@ fi
 #add ubuntu user
 adduser --disabled-password --shell /bin/bash --gecos "ubuntu" ubuntu
 echo 'ubuntu  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
+usermod -aG docker ubuntu
 
 # setting hostname
 local_ip=`jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"'`
