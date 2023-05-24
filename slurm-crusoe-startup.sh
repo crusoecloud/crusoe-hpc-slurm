@@ -25,12 +25,16 @@ export CRUSOE_HOME=/nfs/crusoecloud
 export DEBIAN_FRONTEND=noninteractive
 echo "deb [trusted=yes] https://apt.fury.io/crusoe/ * *" > /etc/apt/sources.list.d/fury.list
 
+adduser --disabled-password --shell /bin/bash --gecos "ubuntu" ubuntu
+echo 'ubuntu  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 apt update && apt upgrade -y
 apt install -y jq preload nvme-cli mdadm nfs-common nfs-kernel-server munge libmunge-dev crusoe ntp
 sudo systemctl enable --now ntp
 # mounting nfs server from headnode
 sudo mkdir -p /nfs
 sudo mount -t nfs $SLURM_HEADNODE_IP:/nfs /nfs
+sudo mount -t nfs $SLURM_HEADNODE_IP:/home /home
 
 # mounting any detected local nvme drives
 num_nvme=\`nvme list | grep -i /dev | wc -l\`

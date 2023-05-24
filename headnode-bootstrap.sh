@@ -22,6 +22,9 @@ elif [[ $num_nvme -gt 1 ]]; then
 else
    echo "no ephemeral drives detected"
 fi
+#add ubuntu user
+adduser --disabled-password --shell /bin/bash --gecos "ubuntu" ubuntu
+echo 'ubuntu  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 # setting hostname
 local_ip=`jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"'`
@@ -31,6 +34,7 @@ host=`jq ".name" /root/metadata.json | tr -d '"'`
 # setup local nfs for slurm
 mkdir -p /nfs
 echo "/nfs 172.27.0.0/16(rw,async,no_subtree_check,no_root_squash)" | tee /etc/exports
+echo "/home 172.27.0.0/16(rw,sync,no_subtree_check,no_root_squash)" | tee -a /etc/exports
 sudo systemctl enable --now nfs-kernel-server
 sudo exportfs -av
 
