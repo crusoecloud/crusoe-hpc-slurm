@@ -138,6 +138,7 @@ mv /tmp/targets-prom.py /nfs/monitoring/targets-prom.py
 chmod +x /nfs/monitoring/targets-prom.py
 python3 /nfs/monitoring/targets-prom.py add $host
 
+/usr/sbin/grafana-cli plugins install grafana-piechart-panel
 #Start services
 sudo systemctl enable --now telegraf
 sudo systemctl enable --now prometheus
