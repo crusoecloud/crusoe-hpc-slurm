@@ -129,11 +129,14 @@ echo 'deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https
 apt update && apt install -y telegraf prometheus grafana
 
 mv /tmp/telegraf.conf /etc/telegraf/telegraf.conf
-sed -i "s|@HEADNODE_IP@|$local_ip|g" /etc/telegraf/telegraf.conf
 cp /etc/telegraf/telegraf.conf /nfs/monitoring/telegraf.conf
 
 mv /tmp/prometheus.yml /etc/prometheus/prometheus.yml
 sed -i "s|@HEADNODE@|$host|g" /etc/prometheus/prometheus.yml
+
+mv /tmp/targets-prom.py /nfs/monitoring/targets-prom.py
+chmod +x /nfs/monitoring/targets-prom.py
+python3 /nfs/monitoring/targets-prom.py add $host
 
 #Start services
 sudo systemctl enable --now telegraf

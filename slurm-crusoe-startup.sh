@@ -104,7 +104,7 @@ echo 'deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https
 
 apt update && apt install -y telegraf
 cp /nfs/monitoring/telegraf.conf /etc/telegraf/telegraf.conf
-
+systemctl enable --now telegraf
 systemctl enable --now slurmd.service
 END
 
@@ -124,5 +124,6 @@ wait
 for host in $hosts; do
    compute_private_ip=$($CRUSOE_HOME/crusoe compute vms get $host -f json | jq ".network_interfaces[0].ips[0].private_ipv4.address" | tr -d '"')
    echo "$compute_private_ip    $host" | tee -a /etc/hosts
+   python3 /nfs/monitoring/targets-prom.py add $host
    $SLURM_ROOT/bin/scontrol update nodename=$host nodeaddr=$compute_private_ip nodehostname=$host
 done

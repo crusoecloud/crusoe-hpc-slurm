@@ -13,6 +13,7 @@ export PATH=$PATH:/usr/bin:/usr/local/bin:/nfs/slurm/bin
 function crusoe_stop()
 {
     $CRUSOE_HOME/crusoe compute vms stop $1
+    python3 /nfs/monitoring/targets-prom.py remove $1
 }
 
 function crusoe_delete()

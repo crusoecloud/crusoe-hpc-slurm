@@ -132,6 +132,16 @@ resource "crusoe_compute_instance" "headnode_vm" {
         private_key = file("${local.my_ssh_privkey_path}")
       }
     }
+    provisioner "file" {
+      source      = "monitoring/targets-prom.py"
+      destination = "/tmp/targets-prom.py"
+      connection {
+        type = "ssh"
+        user = "root"
+        host = "${self.network_interfaces[0].public_ipv4.address}"
+        private_key = file("${local.my_ssh_privkey_path}")
+      }
+    }
     provisioner "local-exec" {
         command = "rm -rf /tmp/metadata.${self.name}.json"
     }

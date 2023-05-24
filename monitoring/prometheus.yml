@@ -44,5 +44,6 @@ scrape_configs:
       - targets: ['localhost:9100']
 
   - job_name: telegraf
-    static_configs:
-      - targets: ['@HEADNODE@:9125']
+    file_sd_configs:
+    - files:
+      - '/nfs/monitoring/targets.json'
