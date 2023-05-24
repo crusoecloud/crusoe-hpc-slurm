@@ -11,8 +11,10 @@ The terraform script will simply provision a headnode, the `headnode-bootstrap.s
 2. A NFS server is also setup at `/nfs/slurm` which provides the SLURM binaries, libraries and helper code to the ephemeral compute nodes
 3. Download and install SLURM source tree. The SLURM version is controlled by the bootstrap script to ensure its supported on Crusoe. Changing the version in the repo is NOT supported, unless is validated by Crusoe.
 
-TODO:
-Will host the headnode as a frontend for a Grafana interface and have telemetry from the compute nodes push to a time series on the headnode.
+## Monitoring
+![heatmap](/imgs/heatmap.png)
+The headnode is hosting a Telegraf-Prometheus-Grafana(TPG)-stack, and each worker runs Telegraf and creates a `/metrics` endpoint from which the 
+headnode Prometheus will poll. 
 
 ## Deployment
 Step 1. Install Terraform

@@ -152,3 +152,4 @@ curl --insecure 'http://admin:admin@127.0.0.1:3000/api/datasources' -X POST -H '
 
 sudo systemctl enable --now slurmctld
 sudo systemctl enable --now slurmd
+sudo systemctl restart prometheus
