@@ -1,6 +1,6 @@
 # Create an Autoscaled-enabled SLURM Cluster on Crusoe
 
-This is a reference design implementation of [SLURM](https://slurm.schedmd.com/overview.html) on Crusoe Cloud. This implementation has support for multiple paritions and specific nodegroups within those partitions. The cluster also has support to a cluster autoscaler that will provision instances on Crusoe based on demand on the cluster. Finally we have include support for NVIDIA [enroot](https://github.com/NVIDIA/enroot) and [pyxis](https://github.com/NVIDIA/pyxis). Which allows you to run distributed workloads with native container support. The terraform script `main.tf` is the main entry point which will just provision the headnode and using the SLURM Power Plugin will start additional compute nodes based on jobs submitted to the headnode.
+This is a reference design implementation of [SLURM](https://slurm.schedmd.com/overview.html) on Crusoe Cloud. This implementation has support for multiple paritions and specific nodegroups within those partitions. The cluster also has support to a cluster autoscaler that will provision instances on Crusoe based on demand on the cluster. The terraform script `main.tf` is the main entry point which will just provision the headnode and using the SLURM Power Plugin will start additional compute nodes based on jobs submitted to the headnode.
 
 ## Known Issues
 1. Currently we only have GPU-enabled instances, the headnode of the cluster is based on a single GPU to lower costs. This will be replaced with CPU-based instances once available
@@ -12,7 +12,7 @@ The terraform script will simply provision a headnode, the `headnode-bootstrap.s
 3. Download and install SLURM source tree. The SLURM version is controlled by the bootstrap script to ensure its supported on Crusoe. Changing the version in the repo is NOT supported, unless is validated by Crusoe.
 
 ## Support for NVIDIA Enroot/Pyxis
-Included in the deployment is support for enroot and pyxis. Purpose built to support native container orchestration within SLURM to run container images across the cluster.
+Included in the deployment is support for (enroot)[https://github.com/NVIDIA/enroot] and pyxis. Purpose built to support native container orchestration within SLURM to run container images across the cluster.
 All enroot images are on the `/scratch` directory of each node in the cluster. Adding credentials to access various registries can be done by editing a `$HOME/enroot/.credentials` file.
 
 ## Monitoring
