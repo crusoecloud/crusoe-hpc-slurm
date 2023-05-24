@@ -15,7 +15,7 @@ The terraform script will simply provision a headnode, the `headnode-bootstrap.s
 ![heatmap](/imgs/heatmap.png)
 The headnode is hosting a Telegraf-Prometheus-Grafana(TPG)-stack, and each worker runs Telegraf and creates a `/metrics` endpoint from which the 
 headnode Prometheus will poll. 
-
+![metrics](/imgs/metrics.png)
 ## Deployment
 Step 1. Install Terraform
 On your client machine where you deploy the headnode of the cluster install Terraform following the instructions [here](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli).
