@@ -82,7 +82,6 @@ mv /tmp/slurm-crusoe-startup.sh $SLURM_HOME/bin && chmod +x $SLURM_HOME/bin/slur
 touch $SLURM_HOME/etc/gres.conf
 # set execute bit on crusoe binary
 mkdir -p /nfs/crusoecloud
-chmod +x /root/crusoe && mv /root/crusoe /nfs/crusoecloud
 cp /etc/profile.d/crusoe-cli.sh /nfs/crusoecloud
 
 DEBIAN_FRONTEND=noninteractive apt install -y jq squashfs-tools parallel fuse-overlayfs libnvidia-container-tools pigz \

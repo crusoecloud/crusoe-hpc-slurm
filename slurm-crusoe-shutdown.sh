@@ -12,13 +12,13 @@ export PATH=$PATH:/usr/bin:/usr/local/bin:/nfs/slurm/bin
 
 function crusoe_stop()
 {
-    $CRUSOE_HOME/crusoe compute vms stop $1
+    crusoe compute vms stop $1
     python3 /nfs/monitoring/targets-prom.py remove $1
 }
 
 function crusoe_delete()
 {
-    $CRUSOE_HOME/crusoe compute vms delete $1  >> $SLURM_POWER_LOG 2>&1
+    crusoe compute vms delete $1  >> $SLURM_POWER_LOG 2>&1
     sed -i "/$1/d" $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
 }
 

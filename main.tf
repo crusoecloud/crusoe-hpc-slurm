@@ -50,21 +50,11 @@ resource "crusoe_compute_instance" "headnode_vm" {
       }
     }
     provisioner "local-exec" {
-      command = "~/go/bin/crusoe compute vms get ${self.name} -f json >> /tmp/metadata.${self.name}.json"
+      command = "crusoe compute vms get ${self.name} -f json >> /tmp/metadata.${self.name}.json"
     }
     provisioner "file" {
       source      = "/tmp/metadata.${self.name}.json"
       destination = "/root/metadata.json"
-      connection {
-        type = "ssh"
-        user = "root"
-        host = "${self.network_interfaces[0].public_ipv4.address}"
-        private_key = file("${local.my_ssh_privkey_path}")
-      }
-    }
-    provisioner "file" {
-      source      = "~/go/bin/linux_amd64/crusoe"
-      destination = "/root/crusoe"
       connection {
         type = "ssh"
         user = "root"

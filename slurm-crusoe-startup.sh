@@ -56,7 +56,7 @@ fi
 # setting hostname
 cp \$CRUSOE_HOME/crusoe-cli.sh /etc/profile.d/crusoe-cli.sh
 . /etc/profile.d/crusoe-cli.sh
-\$CRUSOE_HOME/crusoe compute vms get $1 -f json >> /root/metadata.json
+crusoe compute vms get $1 -f json >> /root/metadata.json
 local_ip=\$(jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"')
 host=\$(jq ".name" /root/metadata.json | tr -d '"')
 /usr/bin/hostname $1
@@ -113,7 +113,7 @@ systemctl enable --now telegraf
 systemctl enable --now slurmd.service
 END
 
-    $CRUSOE_HOME/crusoe compute vms create --name $1 --type a100-80gb.1x \
+    crusoe compute vms create --name $1 --type a100-80gb.1x \
         --startup-script $TMPFILE --keyfile $CRUSOE_SSH_PUBLIC_KEY_FILE >> $SLURM_POWER_LOG 2>&1
     rm -rf $TMPFILE
 }
@@ -127,7 +127,7 @@ for host in $hosts; do
 done
 wait
 for host in $hosts; do
-   compute_private_ip=$($CRUSOE_HOME/crusoe compute vms get $host -f json | jq ".network_interfaces[0].ips[0].private_ipv4.address" | tr -d '"')
+   compute_private_ip=$(crusoe compute vms get $host -f json | jq ".network_interfaces[0].ips[0].private_ipv4.address" | tr -d '"')
    echo "$compute_private_ip    $host" | tee -a /etc/hosts
    python3 /nfs/monitoring/targets-prom.py add $host
    $SLURM_ROOT/bin/scontrol update nodename=$host nodeaddr=$compute_private_ip nodehostname=$host
