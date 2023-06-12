@@ -19,8 +19,7 @@ provider "crusoe" {
 }
 
 resource "crusoe_compute_instance" "headnode_vm" {
-    count = 1
-    name = "crusoe-headnode-${count.index}"
+    name = "crusoe-headnode-0"
     type = local.headnode_instance_type
     ssh_key = local.my_ssh_pubkey
     startup_script = file("headnode-bootstrap.sh")
@@ -135,4 +134,16 @@ resource "crusoe_compute_instance" "headnode_vm" {
     provisioner "local-exec" {
         command = "rm -rf /tmp/metadata.${self.name}.json"
     }
+}
+
+resource "crusoe_vpc_firewall_rule" "grafana_rule" {
+  network           = crusoe_compute_instance.headnode_vm.network_interfaces[0].network
+  name              = "grafana-access"
+  action            = "allow"
+  direction         = "ingress"
+  protocols         = "tcp"
+  source            = "0.0.0.0/0"
+  source_ports      = "*"
+  destination       = crusoe_compute_instance.headnode_vm.network_interfaces[0].public_ipv4.address
+  destination_ports = "3000"
 }
