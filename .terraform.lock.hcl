@@ -1,0 +1,24 @@
+# This file is maintained automatically by "terraform init".
+# Manual edits may be lost in future updates.
+
+provider "registry.terraform.io/crusoecloud/crusoe" {
+  version = "0.1.1"
+  hashes = [
+    "h1:orAdJS7SVOenITgH1K8BNOLIitHoapD6dSsaM///nbQ=",
+    "zh:062758d43f014ad203334c0c4941472a18b4359797e9be3e524f2c73d19e2cac",
+    "zh:1db33de73e22dd295c0f83452abf13d969a92c87c944798a1674bd3030071956",
+    "zh:20827a57e02ceed4048a7a213aff297f2698fa3e350bfe219c83ad5bafb4e65f",
+    "zh:211a6a98c8b6d883a8c093865bf8eddc98318ebb8b22532978ec31e2493185f8",
+    "zh:3c7c6371951ca89d1ab6b7cbcb8610ce01c8da67f743435fad55de14b1fa213c",
+    "zh:460a84cfd5d6bb2c62d634844ea1a2d3bc81c17f0d380452a5658988943523fb",
+    "zh:6182b9137e4bebc58c26155abf7c2835da750d631e922fca1b1874b973f80f29",
+    "zh:96c1ba06ced1230b7619b90435e50d6543c16c50ae9d464c900edead72922112",
+    "zh:b0878f9c422add79437d9aadec25645725a1683e418cf3b917edd60bbdfe415a",
+    "zh:b206a5c1310cfb857367c6a18e142bd5b601d2ca5a17e10bdd172ea9615055f1",
+    "zh:ba1362f23c929877ae01633574a085203f509edadbb2187e8700b30fabf35233",
+    "zh:c640049565f43defb6b202138971e51272c9ce58c6745d43f391f3b49fe01df5",
+    "zh:df802a2b748c6ae379afcb13c59f4f3669d2bef6a0e494b5f8bd9addd1ba615f",
+    "zh:f04691f58f2d90a85c9d3e6d66fc47b58afe113ee9d1fae9f8477b5b163e0af5",
+    "zh:f809ab383cca0a5f83072981c64208cbd7fa67e986a86ee02dd2c82333221e32",
+  ]
+}
