@@ -12,14 +12,8 @@ locals {
   headnode_instance_type="a40.1x"
 }
 
-provider "crusoe" {
-  # staging env
-  access_key = "${var.access_key}"
-  secret_key = "${var.secret_key}"
-}
-
-resource "crusoe_compute_instance" "headnode_vm" {
-    name = "crusoe-headnode-0"
+resource "crusoe_compute_instance" "headnode_vm1" {
+    name = "crusoe-headnode-1"
     type = local.headnode_instance_type
     ssh_key = local.my_ssh_pubkey
     startup_script = file("headnode-bootstrap.sh")
@@ -137,13 +131,13 @@ resource "crusoe_compute_instance" "headnode_vm" {
 }
 
 resource "crusoe_vpc_firewall_rule" "grafana_rule" {
-  network           = crusoe_compute_instance.headnode_vm.network_interfaces[0].network
+  network           = crusoe_compute_instance.headnode_vm1.network_interfaces[0].network
   name              = "grafana-access"
   action            = "allow"
   direction         = "ingress"
   protocols         = "tcp"
   source            = "0.0.0.0/0"
-  source_ports      = "*"
-  destination       = crusoe_compute_instance.headnode_vm.network_interfaces[0].public_ipv4.address
+  source_ports      = "1-65535"
+  destination       = crusoe_compute_instance.headnode_vm1.network_interfaces[0].public_ipv4.address
   destination_ports = "3000"
 }
