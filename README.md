@@ -12,7 +12,7 @@ The terraform script will simply provision a headnode, the `headnode-bootstrap.s
 3. Download and install SLURM source tree. The SLURM version is controlled by the bootstrap script to ensure its supported on Crusoe. Changing the version in the repo is NOT supported, unless is validated by Crusoe.
 
 ## Support for NVIDIA Enroot/Pyxis
-Included in the deployment is support for (enroot)[https://github.com/NVIDIA/enroot] and pyxis. Purpose built to support native container orchestration within SLURM to run container images across the cluster.
+Included in the deployment is support for [enroot](https://github.com/NVIDIA/enroot) and [Pyxis](https://github.com/NVIDIA/pyxis). Purpose built to support native container orchestration within SLURM to run container images across the cluster.
 All enroot images are on the `/scratch` directory of each node in the cluster. Adding credentials to access various registries can be done by editing a `$HOME/enroot/.credentials` file.
 
 ## Monitoring

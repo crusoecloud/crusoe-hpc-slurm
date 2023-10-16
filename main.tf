@@ -10,12 +10,23 @@ locals {
   my_ssh_privkey_path="/Users/amrragab/.ssh/id_ed25519"
   my_ssh_pubkey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIdc3Aaj8RP7ru1oSxUuehTRkpYfvxTxpvyJEZqlqyze amrragab@MBP-Amr-Ragab.local"
   headnode_instance_type="a40.1x"
+  deploy_location = "us-northcentral1-a"
 }
 
+resource "crusoe_storage_disk" "headnode_disk" {
+    name = "headnode-disk"
+    size = "512GiB"
+    location = local.deploy_location
+}
 resource "crusoe_compute_instance" "headnode_vm1" {
     name = "crusoe-headnode-1"
     type = local.headnode_instance_type
     ssh_key = local.my_ssh_pubkey
+    location = local.deploy_location
+    image = "nvidia-docker:latest"
+    disks = [ 
+      crusoe_storage_disk.headnode_disk
+    ]
     startup_script = file("headnode-bootstrap.sh")
 
     provisioner "file" {
