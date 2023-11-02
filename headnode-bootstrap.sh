@@ -1,11 +1,10 @@
 #!/bin/bash
-
+sleep 180
 # adding packages
-export DEBIAN_FRONTEND=noninteractive
 echo "deb [trusted=yes] https://apt.fury.io/crusoe/ * *" > /etc/apt/sources.list.d/fury.list
 
-apt update && apt upgrade -y
-apt install -y jq preload nvme-cli mdadm nfs-common nfs-kernel-server munge libmunge-dev crusoe ntp
+DEBIAN_FRONTEND=noninteractive apt update && DEBIAN_FRONTEND=noninteractive apt upgrade -y
+DEBIAN_FRONTEND=noninteractive apt install -y build-essential mailutils jq preload nvme-cli mdadm nfs-common nfs-kernel-server munge libmunge-dev crusoe
 sudo systemctl enable --now ntp
 # mounting any detected local nvme drives
 num_nvme=`nvme list | grep -i /dev | wc -l`
@@ -27,10 +26,12 @@ adduser --disabled-password --shell /bin/bash --gecos "ubuntu" ubuntu
 echo 'ubuntu  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
 usermod -aG docker ubuntu
 
+ssh-keygen -t ed25519 -f /home/ubuntu/.ssh/id_ed25519 -N ""
+cat /home/ubuntu/.ssh/id_ed25519.pub >> /home/ubuntu/.ssh/authorized_keys
+
 # setting hostname
 local_ip=`jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"'`
 host=`jq ".name" /root/metadata.json | tr -d '"'`
-/usr/bin/hostname $host
 
 # setup local nfs for slurm
 mkdir -p /nfs
@@ -49,7 +50,7 @@ sudo systemctl enable --now munge
 
 #SLURM headnode download extract install
 export SLURM_HOME=/nfs/slurm
-wget -O /tmp/slurm.tar.bz2 "https://download.schedmd.com/slurm/slurm-23.02.2.tar.bz2"
+wget -O /tmp/slurm.tar.bz2 "https://download.schedmd.com/slurm/slurm-23.02.6.tar.bz2"
 tar -xvf /tmp/slurm.tar.bz2 -C /tmp
 /tmp/slurm-*/configure --prefix=$SLURM_HOME && make -j $(nproc) && make install
 mv /tmp/slurm-*/etc $SLURM_HOME
@@ -74,17 +75,20 @@ mkdir -p $SLURM_HOME/etc/slurm.conf.d
 # Configure SLURM nodes
 echo "NodeName=@RANGE@ CPUs=8 State=Cloud" | sudo tee $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
 sed -i "s|@RANGE@|$host|g" $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
-echo "NodeName=aragab-compute-[0-20] CPUs=8 State=Cloud" | sudo tee -a $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
+echo "NodeName=aragab-compute-[0-31] CPUs=176 Boards=1 SocketsPerBoard=2 CoresPerSocket=44 ThreadsPerCore=2 RealMemory=967531 Gres=gpu:8 State=Cloud" | sudo tee -a $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
 
 # Put Startup/Shutdown scripts in place
 mv /tmp/slurm-crusoe-shutdown.sh $SLURM_HOME/bin && chmod +x $SLURM_HOME/bin/slurm-crusoe-shutdown.sh
 mv /tmp/slurm-crusoe-startup.sh $SLURM_HOME/bin && chmod +x $SLURM_HOME/bin/slurm-crusoe-startup.sh
 touch $SLURM_HOME/etc/gres.conf
+echo "Autodetect=off" | sudo tee $SLURM_HOME/etc/gres.conf
+echo "NodeName=aragab-compute-[0-31] Name=gpu File=/dev/nvidia[0-7]" | sudo tee -a $SLURM_HOME/etc/gres.conf
+
 # set execute bit on crusoe binary
 mkdir -p /nfs/crusoecloud
 cp /etc/profile.d/crusoe-cli.sh /nfs/crusoecloud
 
-DEBIAN_FRONTEND=noninteractive apt install -y jq squashfs-tools parallel fuse-overlayfs libnvidia-container-tools pigz \
+DEBIAN_FRONTEND=noninteractive apt install -y jq squashfs-tools parallel fuse-overlayfs pigz \
                                               squashfuse devscripts debhelper zstd libslurm-dev
 
 # Install Enroot

@@ -9,8 +9,8 @@ terraform {
 locals {
   my_ssh_privkey_path="/Users/amrragab/.ssh/id_ed25519"
   my_ssh_pubkey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIdc3Aaj8RP7ru1oSxUuehTRkpYfvxTxpvyJEZqlqyze amrragab@MBP-Amr-Ragab.local"
-  headnode_instance_type="a40.1x"
-  deploy_location = "us-northcentral1-a"
+  headnode_instance_type="c1a.32x"
+  deploy_location = "us-east1-a"
 }
 
 resource "crusoe_storage_disk" "headnode_disk" {
@@ -23,7 +23,7 @@ resource "crusoe_compute_instance" "headnode_vm1" {
     type = local.headnode_instance_type
     ssh_key = local.my_ssh_pubkey
     location = local.deploy_location
-    image = "nvidia-docker:latest"
+    image = "ubuntu20.04:latest"
     disks = [ 
       crusoe_storage_disk.headnode_disk
     ]
@@ -149,6 +149,6 @@ resource "crusoe_vpc_firewall_rule" "grafana_rule" {
   protocols         = "tcp"
   source            = "0.0.0.0/0"
   source_ports      = "1-65535"
-  destination       = crusoe_compute_instance.headnode_vm1.network_interfaces[0].public_ipv4.address
+  destination       = crusoe_compute_instance.headnode_vm1.network_interfaces[0].private_ipv4.address
   destination_ports = "3000"
 }

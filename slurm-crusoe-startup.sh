@@ -2,6 +2,14 @@
 # AUTHOR: AMR RAGAB
 # DESCRIPTION: SLURM STARTUP
 # Script/Code is provided, as is, and with no warranty
+export IB_PARTITION_ID="--ib-partition-id 6dcef748-dc30-49d8-9a0b-6ac87a27b4f8"
+export COMPUTE_IMAGE="ubuntu20.04-nvidia-sxm-docker:2023-10-24"
+export COMPUTE_REGION=us-east1-a
+export COMPUTE_TYPE=h100-80gb-sxm-ib.8x
+
+##############################################
+# DONOT EDIT BELOW THIS LINE
+##############################################
 export SLURM_HOME=/nfs/slurm
 export CRUSOE_HOME=/nfs/crusoecloud
 export SLURM_HEADNODE_IP=$(jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"')
@@ -9,9 +17,6 @@ export SLURM_HEADNODE_NAME=$(jq ".name" /root/metadata.json | tr -d '"')
 export SLURM_POWER_LOG=/var/log/power_save.log
 export PATH=$PATH:/usr/bin:/usr/local/bin:/nfs/slurm/bin
 . $CRUSOE_HOME/crusoe-cli.sh
-##############################################
-# DONOT EDIT BELOW THIS LINE
-##############################################
 
 function crusoe_startup()
 {
@@ -30,7 +35,7 @@ echo 'ubuntu  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
 usermod -aG docker ubuntu
 
 apt update && apt upgrade -y
-apt install -y jq preload nvme-cli mdadm nfs-common nfs-kernel-server munge libmunge-dev crusoe ntp
+DEBIAN_FRONTEND=noninteractive apt install -y jq preload nvme-cli mdadm nfs-common nfs-kernel-server munge libmunge-dev crusoe
 sudo systemctl enable --now ntp
 # mounting nfs server from headnode
 sudo mkdir -p /nfs
@@ -59,7 +64,6 @@ cp \$CRUSOE_HOME/crusoe-cli.sh /etc/profile.d/crusoe-cli.sh
 crusoe compute vms get $1 -f json >> /root/metadata.json
 local_ip=\$(jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"')
 host=\$(jq ".name" /root/metadata.json | tr -d '"')
-/usr/bin/hostname $1
 
 #Setup Munge
 sudo cp \$SLURM_HOME/munge.key /etc/munge/munge.key
@@ -113,8 +117,8 @@ systemctl enable --now telegraf
 systemctl enable --now slurmd.service
 END
 
-    crusoe compute vms create --name $1 --type a100-80gb.1x \
-        --startup-script $TMPFILE --keyfile $CRUSOE_SSH_PUBLIC_KEY_FILE >> $SLURM_POWER_LOG 2>&1
+    crusoe compute vms create --name $1 --type $COMPUTE_TYPE --location $COMPUTE_REGION --image $COMPUTE_IMAGE \
+        --startup-script $TMPFILE --keyfile $CRUSOE_SSH_PUBLIC_KEY_FILE $IB_PARTITION_ID >> $SLURM_POWER_LOG 2>&1
     rm -rf $TMPFILE
 }
 
