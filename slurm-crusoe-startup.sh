@@ -59,7 +59,10 @@ cp \$CRUSOE_HOME/crusoe-cli.sh /etc/profile.d/crusoe-cli.sh
 crusoe compute vms get $1 -f json >> /root/metadata.json
 local_ip=\$(jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"')
 host=\$(jq ".name" /root/metadata.json | tr -d '"')
-/usr/bin/hostname $1
+location=\$(jq ".location" /root/metadata.json | tr -d '"')
+
+echo -e "Domains=\$location.compute.internal" | sudo tee -a /etc/systemd/resolved.conf
+sudo systemctl restart systemd-resolved
 
 #Setup Munge
 sudo cp \$SLURM_HOME/munge.key /etc/munge/munge.key
@@ -128,7 +131,6 @@ done
 wait
 for host in $hosts; do
    compute_private_ip=$(crusoe compute vms get $host -f json | jq ".network_interfaces[0].ips[0].private_ipv4.address" | tr -d '"')
-   echo "$compute_private_ip    $host" | tee -a /etc/hosts
    python3 /nfs/monitoring/targets-prom.py add $host
    $SLURM_ROOT/bin/scontrol update nodename=$host nodeaddr=$compute_private_ip nodehostname=$host
 done

@@ -27,10 +27,13 @@ adduser --disabled-password --shell /bin/bash --gecos "ubuntu" ubuntu
 echo 'ubuntu  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers
 usermod -aG docker ubuntu
 
-# setting hostname
+# setting hostname and dns
 local_ip=`jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"'`
 host=`jq ".name" /root/metadata.json | tr -d '"'`
-/usr/bin/hostname $host
+location=`jq ".location" /root/metadata.json | tr -d '"'`
+
+echo "Domains=$location.compute.internal" | sudo tee -a /etc/systemd/resolved.conf
+sudo systemctl restart systemd-resolved
 
 # setup local nfs for slurm
 mkdir -p /nfs
