@@ -2,9 +2,6 @@
 
 This is a reference design implementation of [SLURM](https://slurm.schedmd.com/overview.html) on Crusoe Cloud. This implementation has support for multiple paritions and specific nodegroups within those partitions. The cluster also has support to a cluster autoscaler that will provision instances on Crusoe based on demand on the cluster. The terraform script `main.tf` is the main entry point which will just provision the headnode and using the SLURM Power Plugin will start additional compute nodes based on jobs submitted to the headnode.
 
-## Known Issues
-1. Currently we only have GPU-enabled instances, the headnode of the cluster is based on a single GPU to lower costs. This will be replaced with CPU-based instances once available
-
 ## Description of the Architecture
 The terraform script will simply provision a headnode, the `headnode-bootstrap.sh`script will perform the following:
 1. Will scan for number of ephemeral drives and mount it as RAID0 for number of drives > 1 at mount point `/raid0` for instances with a single nvme local epehmeral drive it will be mounted as `/nvme` and the `scratch` directory will inside that path

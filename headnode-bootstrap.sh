@@ -32,6 +32,10 @@ cat /home/ubuntu/.ssh/id_ed25519.pub >> /home/ubuntu/.ssh/authorized_keys
 # setting hostname
 local_ip=`jq ".network_interfaces[0].ips[0].private_ipv4.address" /root/metadata.json | tr -d '"'`
 host=`jq ".name" /root/metadata.json | tr -d '"'`
+location=`jq ".location" /root/metadata.json | tr -d '"'`
+
+echo "Domains=$location.compute.internal" | sudo tee -a /etc/systemd/resolved.conf
+sudo systemctl restart systemd-resolved
 
 # setup local nfs for slurm
 mkdir -p /nfs
