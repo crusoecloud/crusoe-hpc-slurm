@@ -77,7 +77,7 @@ mkdir -p $SLURM_HOME/etc/slurm.conf.d
 # Configure SLURM nodes
 echo "NodeName=@RANGE@ CPUs=8 State=Cloud" | sudo tee $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
 sed -i "s|@RANGE@|$host|g" $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
-echo "NodeName=aragab-compute-[0-20] CPUs=8 State=Cloud" | sudo tee -a $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
+echo "NodeName=crusoe-compute-[0-20] CPUs=8 State=Cloud" | sudo tee -a $SLURM_HOME/etc/slurm.conf.d/slurm_nodes.conf
 
 # Put Startup/Shutdown scripts in place
 mv /tmp/slurm-crusoe-shutdown.sh $SLURM_HOME/bin && chmod +x $SLURM_HOME/bin/slurm-crusoe-shutdown.sh
