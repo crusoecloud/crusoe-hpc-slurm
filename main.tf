@@ -9,7 +9,7 @@ terraform {
 
 locals {
   my_ssh_privkey_path    = "~/.ssh/id_ed25519"
-  my_ssh_pubkey          = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFxu4fSr7AILGLlkr5xyJ+x7G5an0mO4WDTuuL2MDXym agutierrez@crusoeenergy.com" # TODO
+  my_ssh_pubkey          = "<SSH_PUBLIC_KEY>"
   headnode_instance_type = "a40.1x"
   deploy_location        = "us-northcentral1-a"
 }
