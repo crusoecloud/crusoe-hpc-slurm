@@ -1,3 +1,7 @@
+# Deprecation notice
+
+As of May 14, 2024, we have deprecated this solution in favor of [github.com/crusoecloud/slurm](https://github.com/crusoecloud/slurm). This solution will remain available in a read-only mode; however, we are not able to provide ongoing maintenance for this solution.
+
 # Create an Autoscaled-enabled SLURM Cluster on Crusoe
 
 This is a reference design implementation of [SLURM](https://slurm.schedmd.com/overview.html) on Crusoe Cloud. This implementation has support for multiple paritions and specific nodegroups within those partitions. The cluster also has support to a cluster autoscaler that will provision instances on Crusoe based on demand on the cluster. The terraform script `main.tf` is the main entry point which will just provision the headnode and using the SLURM Power Plugin will start additional compute nodes based on jobs submitted to the headnode.
